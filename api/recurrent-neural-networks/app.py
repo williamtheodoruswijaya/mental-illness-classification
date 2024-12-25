@@ -6,6 +6,9 @@ import string
 from string import punctuation
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import pickle
