@@ -14,10 +14,12 @@ import streamlit as st
 # Load model
 file_path = os.path.join(os.path.dirname(__file__), 'RNNModel.keras')
 model = tf.keras.models.load_model(file_path)
+print(model.summary()) # buat testing aja ke import atau engga modelnya
 
 # Load tokenizer
 with open(os.path.join(os.path.dirname(__file__), 'tokenizer.pkl'), 'rb') as handle:
     tokenizer = pickle.load(handle)
+print(tokenizer) # buat testing juga
 
 label_ordered = {
     'Normal': 0,
@@ -50,7 +52,7 @@ def predict_label(text):
     text = preprocess_text(text)
     text = remove_stopwords(text)
     seq = tokenizer.texts_to_sequences([text])
-    padded = tf.keras.preprocessing.sequence.pad_sequences(seq, maxlen=100)
+    padded = tf.keras.preprocessing.sequence.pad_sequences(seq, maxlen=100, padding='post', truncating='post')
     pred = model.predict(padded).argmax(axis=1)[0]
     return reverse_labels[pred]
 
@@ -63,7 +65,7 @@ def predict_probabilities(text):
     return {label: float(pred[idx]) for label, idx in label_ordered.items()}
 
 # Streamlit UI
-st.title("Mental Illness Classification")
+st.title("Mental Illness Classification using Recurrent Neural Networks")
 input_text = st.text_area("Enter text to analyze:")
 
 if st.button("Predict"):
