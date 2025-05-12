@@ -4,22 +4,25 @@ import tensorflow as tf
 import re
 import string
 import pickle
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import streamlit as st
+
+# Download NLTK resources
+nltk.download('stopwords')
+nltk.download('punkt')
+
+# Setup FastAPI app
+app = FastAPI(title="Mental Illness Classification API")
 
 # Load model
-file_path = os.path.join(os.path.dirname(__file__), 'RNNModel.keras')
-model = tf.keras.models.load_model(file_path)
-print(model.summary()) # buat testing aja ke import atau engga modelnya
+model = tf.keras.models.load_model('RNNModel.keras')
 
 # Load tokenizer
-with open(os.path.join(os.path.dirname(__file__), 'tokenizer.pkl'), 'rb') as handle:
+with open('tokenizer.pkl', 'rb') as handle:
     tokenizer = pickle.load(handle)
-print(tokenizer) # buat testing juga
 
 label_ordered = {
     'Normal': 0,
@@ -31,7 +34,9 @@ label_ordered = {
     'Personality disorder': 6
 }
 reverse_labels = {v: k for k, v in label_ordered.items()}
+stop_words = set(stopwords.words('english'))
 
+# Preprocessing functions
 def preprocess_text(text):
     text = text.lower()
     text = re.sub(r'\[.*?\]', '', text)
@@ -42,21 +47,20 @@ def preprocess_text(text):
     text = re.sub(r'\w*\d\w*', '', text)
     return text
 
-stop_words = set(stopwords.words('english'))
 def remove_stopwords(text):
     tokens = word_tokenize(text)
     tokens = [word for word in tokens if word not in stop_words]
     return ' '.join(tokens)
 
-def predict_label(text):
+def predict_label(text: str) -> str:
     text = preprocess_text(text)
     text = remove_stopwords(text)
     seq = tokenizer.texts_to_sequences([text])
-    padded = tf.keras.preprocessing.sequence.pad_sequences(seq, maxlen=100, padding='post', truncating='post')
+    padded = tf.keras.preprocessing.sequence.pad_sequences(seq, maxlen=100)
     pred = model.predict(padded).argmax(axis=1)[0]
     return reverse_labels[pred]
 
-def predict_probabilities(text):
+def predict_probabilities(text: str):
     text = preprocess_text(text)
     text = remove_stopwords(text)
     seq = tokenizer.texts_to_sequences([text])
@@ -64,16 +68,26 @@ def predict_probabilities(text):
     pred = model.predict(padded)[0]
     return {label: float(pred[idx]) for label, idx in label_ordered.items()}
 
-# Streamlit UI
-st.title("Mental Illness Classification using Recurrent Neural Networks")
-input_text = st.text_area("Enter text to analyze:")
+# Request schema
+class PredictRequest(BaseModel):
+    input: str
 
-if st.button("Predict"):
-    if input_text.strip():
-        label = predict_label(input_text)
-        probs = predict_probabilities(input_text)
-        st.write(f"### Prediction: **{label}**")
-        st.write("### Class probabilities:")
-        st.json(probs)
-    else:
-        st.warning("Please enter some text.")
+# Routes
+@app.post("/mic-predict")
+def classify_text(req: PredictRequest):
+    if not req.input.strip():
+        raise HTTPException(status_code=400, detail="Input must not be empty")
+    
+    label = predict_label(req.input)
+
+    return {
+        "prediction": label,
+    }
+
+@app.post("/mic-predict-many")
+def classify_probabilities(req: PredictRequest):
+    if not req.input.strip():
+        raise HTTPException(status_code=400, detail="Input must not be empty")
+    
+    probs = predict_probabilities(req.input)
+    return probs
