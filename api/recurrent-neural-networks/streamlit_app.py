@@ -18,10 +18,11 @@ nltk.download('punkt')
 app = FastAPI(title="Mental Illness Classification API")
 
 # Load model
-model = tf.keras.models.load_model('RNNModel.keras')
+file_path = os.path.join(os.path.dirname(__file__), 'RNNModel.keras')
+model = tf.keras.models.load_model(file_path)
 
 # Load tokenizer
-with open('tokenizer.pkl', 'rb') as handle:
+with open(os.path.join(os.path.dirname(__file__), 'tokenizer.pkl'), 'rb') as handle:
     tokenizer = pickle.load(handle)
 
 label_ordered = {
