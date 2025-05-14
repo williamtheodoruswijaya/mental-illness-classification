@@ -7,6 +7,8 @@ import pickle
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
 
 from nltk.data import find
