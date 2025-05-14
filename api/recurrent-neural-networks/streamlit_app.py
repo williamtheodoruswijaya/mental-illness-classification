@@ -7,12 +7,14 @@ import pickle
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
 
-# Download NLTK resources
-nltk.download('stopwords')
-nltk.download('punkt')
+from nltk.data import find
+try:
+    find('tokenizers/punkt')
+    find('corpora/stopwords')
+except LookupError as e:
+    raise RuntimeError("Missing NLTK data. Make sure 'punkt' and 'stopwords' are available.") from e
 
 # Setup FastAPI app
 app = FastAPI(title="Mental Illness Classification API")
