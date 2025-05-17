@@ -20,10 +20,10 @@ nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
 stop_words = set(stopwords.words('english'))
 
 # Load model & vectorizer
-with open("voting_classifier.pkl", "rb") as f:
+with open(os.path.join(os.path.dirname(__file__), 'voting_classifier.pkl'), "rb") as f:
     model = pickle.load(f)
 
-with open("vectorizer.pkl", "rb") as f:
+with open(os.path.join(os.path.dirname(__file__), 'vectorizer.pkl'), "rb") as f:
     vectorizer = pickle.load(f)
 
 # Preprocessing steps
