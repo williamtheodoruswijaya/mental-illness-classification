@@ -3,6 +3,7 @@ import re
 import string
 import pickle
 import streamlit as st
+import requests
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -96,5 +97,14 @@ if st.button("Predict"):
     if user_input.strip() == "":
         st.warning("Please enter some text.")
     else:
-        result = predict(user_input)
-        st.success(f"Prediction: {result}")
+        # Panggil FastAPI endpoint
+        response = requests.post(
+            "http://localhost:8000/mic-predict",
+            json={"input": user_input}
+        )
+        if response.status_code == 200:
+            prediction = response.json().get("prediction")
+            st.success(f"Prediction: {prediction}")
+        else:
+            st.error("API call failed")
+
