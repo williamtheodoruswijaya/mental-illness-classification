@@ -88,23 +88,3 @@ def predict_many(payload: InputText):
             model.classes_[i]: float(probs[i]) for i in range(len(model.classes_))
         })
     return results
-
-st.title("Mental Illness Classification")
-
-user_input = st.text_area("Enter text to classify:")
-
-if st.button("Predict"):
-    if user_input.strip() == "":
-        st.warning("Please enter some text.")
-    else:
-        # Panggil FastAPI endpoint
-        response = requests.post(
-            "http://localhost:8000/mic-predict",
-            json={"input": user_input}
-        )
-        if response.status_code == 200:
-            prediction = response.json().get("prediction")
-            st.success(f"Prediction: {prediction}")
-        else:
-            st.error("API call failed")
-
