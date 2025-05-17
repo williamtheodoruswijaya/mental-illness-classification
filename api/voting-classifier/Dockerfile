@@ -2,10 +2,8 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY app.py /app/
-COPY RNNModel.keras /app/
-COPY tokenizer.pkl /app/
-COPY requirements.txt .
+COPY . /app/
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     libjpeg-dev \
@@ -18,8 +16,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
 
-EXPOSE 5000
+EXPOSE 7860
 
-CMD ["python", "app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
