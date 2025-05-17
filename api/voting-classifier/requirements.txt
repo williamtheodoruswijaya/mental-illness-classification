@@ -1,0 +1,11 @@
+Flask==3.1.0
+Flask-Cors==5.0.0
+scikit-learn==1.5.1
+numpy==1.26.4
+gunicorn==20.1.0
+nltk==3.8.1
+fastapi==0.111.0
+pydantic==2.7.1
+catboost==1.2.7
+lightgbm==4.6.0
+xgboost==2.1.3
