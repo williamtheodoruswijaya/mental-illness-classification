@@ -2,8 +2,6 @@ import os
 import re
 import string
 import pickle
-import streamlit as st
-import requests
 
 from fastapi import FastAPI
 from pydantic import BaseModel
