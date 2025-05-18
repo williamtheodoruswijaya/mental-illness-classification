@@ -21,7 +21,7 @@ This API provides endpoints for predicting mental illness classifications based 
 
 ### Base URL
 ```
-https://mental-illness-classification-production.up.railway.app/
+https://adamantix-ensemble-model-mental-illness-classification.hf.space/mic-predict
 ```
 
 ### 1. Home Page
@@ -33,7 +33,7 @@ GET /
 Returns a simple home page indicating that the API is running.
 #### Example Request
 ```bash
-curl -X GET https://mental-illness-classification-production.up.railway.app/
+curl -X GET https://adamantix-ensemble-model-mental-illness-classification.hf.space/mic-predict
 ```
 #### Response
 ```
